@@ -44,7 +44,7 @@ class SawyerIKController(Controller):
         self.setup_inverse_kinematics()
 
         # Should be in (0, 1], smaller values mean less sensitivity.
-        self.user_sensitivity = .1
+        self.user_sensitivity = .3
 
         self.sync_state()
 
@@ -254,11 +254,11 @@ class SawyerIKController(Controller):
         # from its rest configuration. The corresponding line in most demo
         # scripts is:
         #   `env.set_robot_joint_positions([0, -1.18, 0.00, 2.18, 0.00, 0.57, 1.5708])`
-        # rotation = rotation.dot(
-        #     T.rotation_matrix(angle=-np.pi / 2, direction=[0., 0., 1.], point=None)[
-        #         :3, :3
-        #     ]
-        # )
+        rotation = rotation.dot(
+            T.rotation_matrix(angle=-np.pi / 2, direction=[0., 0., 1.], point=None)[
+                :3, :3
+            ]
+        )
 
         self.ik_robot_target_orn = T.mat2quat(rotation)
 

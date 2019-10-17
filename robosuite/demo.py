@@ -1,7 +1,6 @@
 import numpy as np
 import robosuite as suite
 
-import time
 
 if __name__ == "__main__":
 
@@ -43,5 +42,3 @@ if __name__ == "__main__":
         action = np.random.randn(env.dof)
         obs, reward, done, _ = env.step(action)
         env.render()
-        print(i)
-        time.sleep(0.3)
