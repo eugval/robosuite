@@ -32,6 +32,7 @@ def gripper_factory(name):
     if name == "RobotiqGripper":
         return RobotiqGripper()
     if name == "PushingGripper":
+        #Closed two finger gripper
         return PushingGripper()
     if name == "RobotiqThreeFingerGripper":
         return RobotiqThreeFingerGripper()

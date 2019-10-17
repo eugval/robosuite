@@ -2,10 +2,13 @@ from collections import OrderedDict
 from mujoco_py import MjSim, MjRenderContextOffscreen
 from mujoco_py import load_model_from_xml
 
+from gym.utils import seeding
+
 from robosuite.utils import SimulationError, XMLError, MujocoPyRenderer
 
 REGISTERED_ENVS = {}
 
+import time
 
 def register_env(target_class):
     REGISTERED_ENVS[target_class.__name__] = target_class
@@ -89,6 +92,8 @@ class MujocoEnv(metaclass=EnvMeta):
             camera_depth (bool): True if rendering RGB-D, and RGB otherwise.
         """
 
+        self.seed()
+
         self.has_renderer = has_renderer
         self.has_offscreen_renderer = has_offscreen_renderer
         self.render_collision_mesh = render_collision_mesh
@@ -110,6 +115,7 @@ class MujocoEnv(metaclass=EnvMeta):
         self.camera_width = camera_width
         self.camera_depth = camera_depth
 
+        self.pid = None
         self._reset_internal()
 
     def initialize_time(self, control_freq):
@@ -126,6 +132,10 @@ class MujocoEnv(metaclass=EnvMeta):
                 "control frequency {} is invalid".format(control_freq)
             )
         self.control_timestep = 1. / control_freq
+
+    def _setup_pid(self):
+        "Function to setup the pid controller. Should set the self.pid attribute."
+        raise NotImplementedError
 
     def _load_model(self):
         """Loads an xml model, puts it in self.model"""
@@ -167,6 +177,8 @@ class MujocoEnv(metaclass=EnvMeta):
             # hiding the overlay speeds up rendering significantly
             self.viewer.viewer._hide_overlay = True
 
+            self.viewer.viewer._render_every_frame = True
+
         elif self.has_offscreen_renderer:
             if self.sim._render_context_offscreen is None:
                 render_context = MjRenderContextOffscreen(self.sim)
@@ -198,10 +210,17 @@ class MujocoEnv(metaclass=EnvMeta):
         self._pre_action(action)
         end_time = self.cur_time + self.control_timestep
         while self.cur_time < end_time:
+            if(self.pid is not None):
+                self._set_pid_control()
             self.sim.step()
             self.cur_time += self.model_timestep
         reward, done, info = self._post_action(action)
         return self._get_observation(), reward, done, info
+
+    def _set_pid_control(self):
+        "Do any processing required with the pid"
+        current_qvel = self.sim.data.qvel
+        self.sim.data.ctrl[:] = self.pid(current_qvel, self.model_timestep)
 
     def _pre_action(self, action):
         """Do any preprocessing before taking an action."""
@@ -223,7 +242,12 @@ class MujocoEnv(metaclass=EnvMeta):
         """
         Renders to an on-screen window.
         """
+        time.sleep(1/self.control_freq)
         self.viewer.render()
+
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
 
     def observation_spec(self):
         """
@@ -235,12 +259,12 @@ class MujocoEnv(metaclass=EnvMeta):
         current design is easier to use in practice.
         """
         observation = self._get_observation()
-        return observation
+        # return observation
 
-        # observation_spec = OrderedDict()
-        # for k, v in observation.items():
-        #     observation_spec[k] = v.shape
-        # return observation_spec
+        observation_spec = OrderedDict()
+        for k, v in observation.items():
+            observation_spec[k] = v.shape
+        return observation_spec
 
     def action_spec(self):
         """

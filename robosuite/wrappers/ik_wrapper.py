@@ -130,3 +130,7 @@ class IKWrapper(Wrapper):
             # IK controller takes an absolute orientation in robot base frame
             "rotation": T.quat2mat(T.quat_multiply(old_quat, action[3:7])),
         }
+
+    @property
+    def action_spec(self):
+        return self.env.action_spec
