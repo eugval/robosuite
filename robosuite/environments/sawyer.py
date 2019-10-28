@@ -217,83 +217,7 @@ class SawyerEnv(MujocoEnv):
             index = self._ref_indicator_pos_low
             self.sim.data.qpos[index: index + 3] = pos
 
-    # def _pre_action(self, action):
-    #     """
-    #     Overrides the superclass method to actuate the robot with the
-    #     passed joint velocities and gripper control.
-    #
-    #     Args:
-    #         action (numpy array): The control to apply to the robot. The first
-    #             @self.mujoco_robot.dof dimensions should be the desired
-    #             normalized joint velocities and if the robot has
-    #             a gripper, the next @self.gripper.dof dimensions should be
-    #             actuation controls for the gripper.
-    #     """
-    #     if self.pid is None:
-    #         # clip actions into valid range
-    #         assert len(action) == self.dof, "environment got invalid action dimension"
-    #
-    #         if(self.normalised_actions):
-    #             low, high = self.action_spec
-    #             action = np.clip(action, low, high)
-    #
-    #         if self.has_gripper:
-    #             arm_action = action[: self.mujoco_robot.dof]
-    #             gripper_action_in = action[
-    #                                 self.mujoco_robot.dof: self.mujoco_robot.dof + self.gripper.dof
-    #                                 ]
-    #             gripper_action_actual = self.gripper.format_action(gripper_action_in)
-    #             action = np.concatenate([arm_action, gripper_action_actual])
-    #
-    #         if self.normalised_actions:
-    #             # rescale normalized action to control ranges
-    #             ctrl_range = self.sim.model.actuator_ctrlrange
-    #             bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
-    #             weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
-    #             action = bias + weight * action
-    #
-    #
-    #         self.sim.data.ctrl[:] = action
-    #     else:
-    #
-    #         # clip actions into valid range
-    #         assert len(action) == self.dof, "environment got invalid action dimension"
-    #         low, high = self.action_spec
-    #         action = np.clip(action, low, high)
-    #
-    #         # rescaling parameters from normalized action to control ranges
-    #         ctrl_range = self.sim.model.actuator_ctrlrange
-    #         bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
-    #         weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
-    #
-    #         arm_action_applied = action[: self.mujoco_robot.dof] * weight[:self.mujoco_robot.dof] \
-    #                              + bias[:self.mujoco_robot.dof]
-    #
-    #         if self.has_gripper:
-    #             gripper_action_in = action[
-    #                                 self.mujoco_robot.dof: self.mujoco_robot.dof + self.gripper.dof
-    #                                 ]
-    #             gripper_action_actual = self.gripper.format_action(gripper_action_in)
-    #             gripper_action_applied = gripper_action_actual * weight[
-    #                                                              self.mujoco_robot.dof: self.mujoco_robot.dof + self.gripper.dof] \
-    #                                      + bias[self.mujoco_robot.dof:self.mujoco_robot.dof + self.gripper.dof]
-    #
-    #             self.sim.data.ctrl[self._ref_joint_gripper_actuator_indexes] = gripper_action_applied
-    #
-    #         self.pid.reset()
-    #         self.pid.setpoint = arm_action_applied
-    #
-    #     # gravity compensation
-    #     self.sim.data.qfrc_applied[
-    #         self._ref_joint_vel_indexes
-    #     ] = self.sim.data.qfrc_bias[self._ref_joint_vel_indexes]
-    #
-    #     if self.use_indicator_object:
-    #         self.sim.data.qfrc_applied[
-    #         self._ref_indicator_vel_low: self._ref_indicator_vel_high
-    #         ] = self.sim.data.qfrc_bias[
-    #             self._ref_indicator_vel_low: self._ref_indicator_vel_high
-    #             ]
+
     def _pre_action(self, action):
             """
             Overrides the superclass method to actuate the robot with the
@@ -328,14 +252,14 @@ class SawyerEnv(MujocoEnv):
 
 
             if self.has_gripper:
-                gripper_action_actual = self.gripper.format_action(gripper_action)
+                gripper_action = self.gripper.format_action(gripper_action)
                 # rescale normalized action to control ranges
                 ctrl_range = self.sim.model.actuator_ctrlrange[self.mujoco_robot.dof:, :]
                 bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
                 weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
-                gripper_action_actual = bias + weight * gripper_action_actual
+                gripper_action = bias + weight * gripper_action
 
-                action = np.concatenate([arm_action, gripper_action_actual])
+                action = np.concatenate([arm_action, gripper_action])
             else:
                 action = arm_action
 
@@ -343,7 +267,7 @@ class SawyerEnv(MujocoEnv):
             if(self.pid is None):
                 self.sim.data.ctrl[:] = action
             else:
-                self.sim.data.ctrl[self.mujoco_robot.dof:] = gripper_action_actual
+                self.sim.data.ctrl[self.mujoco_robot.dof:] = gripper_action
                 self.pid.reset()
                 self.pid.setpoint = arm_action
 

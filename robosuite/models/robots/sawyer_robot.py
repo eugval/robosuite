@@ -29,6 +29,10 @@ class Sawyer(Robot):
         return ["right_j{}".format(x) for x in range(7)]
 
     @property
+    def links(self):
+        return ["right_l{}".format(x) for x in range(7)]
+
+    @property
     def actuators(self):
         if (self.torque):
             return ["torq_right_j{}".format(x) for x in range(7)]
