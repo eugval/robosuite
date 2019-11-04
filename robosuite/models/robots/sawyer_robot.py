@@ -55,14 +55,6 @@ class Sawyer(Robot):
 
     @property
     def velocity_pid_gains(self):
-        # return {'right_j0': {'p': 10.0, 'i': 0.0, 'd': 0.1},
-        #         'right_j1': {'p': 100.0, 'i': 1.0, 'd': 0.1},
-        #         'right_j2': {'p': 0.05, 'i': 0.0, 'd': 0.01},
-        #         'right_j3': {'p': 0.5, 'i': 0.01, 'd': 0.1},
-        #         'right_j4': {'p': 1.0, 'i': 0.0, 'd': 0.01},
-        #         'right_j5': {'p': 0.05, 'i': 0.0, 'd': 0.01},
-        #         'right_j6': {'p': 0.05, 'i': 0.0, 'd': 0.01},
-        #         }
         return {'right_j0': {'p': 8.0, 'i': 0.0, 'd':  0.0},
                     'right_j1': {'p': 7.0, 'i': 0.0, 'd':  0.0},
                     'right_j2': {'p': 6.0, 'i': 0.0, 'd': 0.0},
