@@ -29,7 +29,7 @@ class SawyerEnv(MujocoEnv):
             camera_height=256,
             camera_width=256,
             camera_depth=False,
-            pid=False
+            pid=True
     ):
         """
         Args:
