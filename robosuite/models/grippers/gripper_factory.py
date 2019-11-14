@@ -5,6 +5,7 @@ from .two_finger_gripper import TwoFingerGripper, LeftTwoFingerGripper
 from .pr2_gripper import PR2Gripper
 from .robotiq_gripper import RobotiqGripper
 from .pushing_gripper import PushingGripper
+from .slide_panel_gripper import SlidePanelGripper
 from .robotiq_three_finger_gripper import RobotiqThreeFingerGripper
 
 
@@ -34,6 +35,8 @@ def gripper_factory(name):
     if name == "PushingGripper":
         #Closed two finger gripper
         return PushingGripper()
+    if name == "SlidePanelGripper" :
+        return SlidePanelGripper()
     if name == "RobotiqThreeFingerGripper":
         return RobotiqThreeFingerGripper()
     raise ValueError("Unkown gripper name {}".format(name))

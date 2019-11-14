@@ -105,7 +105,7 @@ class SawyerEnv(MujocoEnv):
 
     def _setup_pid(self):
         self.pid = PID(dim= self.mujoco_robot.dof, sample_time=None, )
-        limits = (self.sim.model.actuator_ctrlrange[:7, 0], self.sim.model.actuator_ctrlrange[:7, 1])
+        limits = (self.sim.model.actuator_ctrlrange[:7, 0].copy(), self.sim.model.actuator_ctrlrange[:7, 1].copy())
         gains = self.mujoco_robot.velocity_pid_gains
         kps = np.array([gains['right_j{}'.format(actuator)]['p'] for actuator in range(7)])
         kis = np.array([gains['right_j{}'.format(actuator)]['i'] for actuator in range(7)])
