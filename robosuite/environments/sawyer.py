@@ -179,6 +179,8 @@ class SawyerEnv(MujocoEnv):
                 self.sim.model.get_joint_qvel_addr(x) for x in self.gripper_joints
             ]
 
+            self._ref_gripper_body_indx = self.sim.model.body_name2id('right_gripper')
+
         # indices for joint pos actuation, joint vel actuation, gripper actuation
         # self._ref_joint_pos_actuator_indexes = [
         #     self.sim.model.actuator_name2id(actuator)
@@ -286,8 +288,10 @@ class SawyerEnv(MujocoEnv):
                     ]
 
     def _set_pid_control(self):
+        dt = self.model_timestep if self.pid._last_output is not None else 1e-16
+
         current_qvel = self.sim.data.qvel[self._ref_joint_vel_indexes]
-        self.sim.data.ctrl[:self.mujoco_robot.dof] = self.pid(current_qvel, self.model_timestep)
+        self.sim.data.ctrl[:self.mujoco_robot.dof] = self.pid(current_qvel, dt)
 
     def _post_action(self, action):
         """

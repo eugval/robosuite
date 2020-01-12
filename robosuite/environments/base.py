@@ -351,3 +351,10 @@ class MujocoEnv(metaclass=EnvMeta):
     def close(self):
         """Do any cleanup necessary here."""
         self._destroy_viewer()
+
+
+    def get_state(self):
+        return self.sim.get_state()
+
+    def set_state(self, Mj_state):
+        return self.sim.set_state(Mj_state)
