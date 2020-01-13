@@ -358,3 +358,9 @@ class MujocoEnv(metaclass=EnvMeta):
 
     def set_state(self, Mj_state):
         return self.sim.set_state(Mj_state)
+
+    def renderer_on(self):
+        self.has_renderer = True
+
+    def renderer_off(self):
+        self.has_renderer = False
