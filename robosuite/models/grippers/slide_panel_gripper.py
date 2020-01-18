@@ -15,15 +15,17 @@ class SlidePanelGripper(Gripper):
         super().__init__(xml_path_completion("grippers/slide_panel_gripper.xml"))
 
     def format_action(self, action):
-        return np.array([0,0])
+        # return np.array([0.8,-0.8]) #np.array([1, -1])
+        return np.array([]) #np.array([1, -1])
 
     @property
     def init_qpos(self):
-        return np.array([-0.018933, 0.021833])
+       #return np.array([-0.020833, 0.020833])
+       return np.array([])
 
     @property
     def joints(self):
-        return ["r_gripper_l_finger_joint", "r_gripper_r_finger_joint"]
+        return []#["r_gripper_l_finger_joint", "r_gripper_r_finger_joint"]
 
     @property
     def dof(self):
@@ -31,7 +33,7 @@ class SlidePanelGripper(Gripper):
 
     @property
     def visualization_sites(self):
-        return ["grip_site", "slide_panel_centre" ]
+        return ["grip_site", "slide_panel_centre", "grip_site_cylinder" ]
 
     def contact_geoms(self):
         return [
