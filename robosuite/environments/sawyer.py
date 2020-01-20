@@ -241,13 +241,13 @@ class SawyerEnv(MujocoEnv):
                                 self.mujoco_robot.dof: self.mujoco_robot.dof + self.gripper_dof
                                 ]
 
-
+            #TODO: Check that the change in the control range is correct
             # Deal with the arm action
             if(self.normalised_actions):
                 arm_action = np.clip(arm_action, low[:self.mujoco_robot.dof], high[:self.mujoco_robot.dof])
 
                 # rescale normalized action to control ranges
-                ctrl_range = self.mujoco_robot.joint_velocity_limits
+                ctrl_range = self.control_range[:self.mujoco_robot.dof, :]
                 bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
                 weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
                 arm_action = bias + weight * arm_action
@@ -256,7 +256,7 @@ class SawyerEnv(MujocoEnv):
             if self.has_gripper:
                 gripper_action = self.gripper.format_action(gripper_action)
                 # rescale normalized action to control ranges
-                ctrl_range = self.sim.model.actuator_ctrlrange[self.mujoco_robot.dof:, :]
+                ctrl_range = self.control_range[self.mujoco_robot.dof:, :]
                 bias = 0.5 * (ctrl_range[:, 1] + ctrl_range[:, 0])
                 weight = 0.5 * (ctrl_range[:, 1] - ctrl_range[:, 0])
                 gripper_action = bias + weight * gripper_action
@@ -347,6 +347,10 @@ class SawyerEnv(MujocoEnv):
         return di
 
     @property
+    def control_range(self):
+        return self.sim.model.actuator_ctrlrange
+
+    @property
     def action_spec(self):
         """
         Action lower/upper limits per dimension.
@@ -356,7 +360,7 @@ class SawyerEnv(MujocoEnv):
             high = np.ones(self.dof) * 1.
             return low, high
         else:
-            ctrl_range = self.sim.model.actuator_ctrlrange
+            ctrl_range = self.control_range
             return ctrl_range[:,0], ctrl_range[:,1]
 
     @property
