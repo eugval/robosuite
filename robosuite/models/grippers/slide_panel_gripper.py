@@ -47,6 +47,21 @@ class SlidePanelGripper(Gripper):
         ]
 
     @property
+    def contact_geom2body(self):
+        return {
+                    "r_finger_g0": "r_gripper_r_finger",
+                    "r_finger_g1": "r_gripper_r_finger",
+                    "l_finger_g0": "r_gripper_l_finger",
+                    "l_finger_g1": "r_gripper_l_finger",
+                    "r_fingertip_g0": "r_gripper_r_finger_tip",
+                    "l_fingertip_g0": "r_gripper_l_finger_tip",
+                    "slide_panel_g": "slide_panel"
+                }
+
+    def get_contact_body_from_geom(self, geom):
+       return self.contact_geom2body[geom]
+
+    @property
     def left_finger_geoms(self):
         return ["l_finger_g0", "l_finger_g1", "l_fingertip_g0"]
 
