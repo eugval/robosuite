@@ -7,7 +7,7 @@ from robosuite.environments import MujocoEnv
 from robosuite.models.grippers import gripper_factory
 from robosuite.models.robots import Sawyer
 from simple_pid import PID
-
+import copy
 
 class SawyerEnv(MujocoEnv):
     """Initializes a Sawyer robot environment."""
@@ -480,6 +480,22 @@ class SawyerEnv(MujocoEnv):
         Sawyer robots have 7 joints and positions are in rotation angles.
         """
         return self.sim.data.qpos[self._ref_joint_pos_indexes]
+
+    @property
+    def joint_positions(self):
+        """
+        Returns a numpy array of joint positions.
+        Sawyer robots have 7 joints and positions are in rotation angles.
+        """
+        return copy.deepcopy(self.sim.data.qpos[self._ref_joint_pos_indexes])
+
+    @property
+    def joint_velocities(self):
+        """
+        Returns a numpy array of joint velocities.
+        Sawyer robots have 7 joints and velocities are angular velocities.
+        """
+        return copy.deepcopy(self.sim.data.qvel[self._ref_joint_vel_indexes])
 
     @property
     def _joint_velocities(self):
